@@ -31,6 +31,18 @@ public:
 };
 
 template<typename T>
+ostream& operator<< (ostream& os, List<T>* L){
+    auto* temp = L->getHead();
+    os<<"[";
+    while(temp != nullptr){
+        os<<temp->data<<" ";
+        temp = temp->next;
+    }
+    os<<"]";
+    return os;
+}
+
+template<typename T>
 void Invertir_Como_Funcion(List<T> lista){ //O(n)
 
     Node<T>* anterior = nullptr;
