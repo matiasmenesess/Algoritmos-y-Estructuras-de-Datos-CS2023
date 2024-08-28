@@ -117,9 +117,39 @@ public:
         }
     }
 
-    void sort(){
+    void sort() {
+        if (head == nullptr || head->next == nullptr) return;
 
+        Node<T>* actual = head;
+        Node<T>* prev = nullptr;
 
+        bool sorted = false;
+        while (!sorted) {
+            sorted = true;
+
+            while (actual != nullptr && actual->next != nullptr) {
+                Node<T>* posterior = actual->next;
+
+                if (actual->data > posterior->data) {
+                    if (prev == nullptr) {
+                        head = posterior;
+                    } else {
+                        prev->next = posterior;
+                    }
+                    actual->next = posterior->next;
+                    posterior->next = actual;
+
+                    prev = posterior;
+                    sorted = false;
+                } else {
+                    prev = actual;
+                    actual = actual->next;
+                }
+            }
+
+            actual = head;
+            prev = nullptr;
+        }
     }
 
     void reverse(){ //O(n)
