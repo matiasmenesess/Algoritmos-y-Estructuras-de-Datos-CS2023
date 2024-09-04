@@ -4,8 +4,8 @@ using namespace std;
 template<typename T>
 struct Node{
     T data;
-    Node<T> * prev;
-    Node<T> * next;
+    Node<T> * prev = nullptr;
+    Node<T> * next = nullptr;
 };
 
 template<typename T>
