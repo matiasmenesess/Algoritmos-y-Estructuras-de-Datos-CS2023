@@ -136,22 +136,25 @@ public:
         tail = nullptr;
     }
 
-    void reverse() {
-        Node<T>* current = head;
-        Node<T>* temp = nullptr;
+void reverse() {
+    if (head == nullptr || head == tail) return;
 
-        while (current != nullptr) {
-            temp = current->prev;
-            current->prev = current->next;
-            current->next = temp;
-            current = current->prev;
-        }
+    Node<T>* actual = head;
+    Node<T>* temp = nullptr;
 
-        if (temp != nullptr) {
-            tail = head;
-            head = temp->prev;
-        }
+    while (current != nullptr) {
+        temp = actual->prev;
+        actual->prev = actual->next;
+        actual->next = temp;
+        actual = actual->prev;
     }
+
+    if (temp != nullptr) {
+        tail = head; 
+        head = temp->prev; 
+    }
+}
+
 };
 
 int main() {
