@@ -12,8 +12,7 @@ template<typename T>
 class Double_Linked_List{
 private:
     Node<T>* head = nullptr;
-    Node<T>* tail;
-
+    Node<T>* tail = nullptr;
 
 public:
     T front() {
