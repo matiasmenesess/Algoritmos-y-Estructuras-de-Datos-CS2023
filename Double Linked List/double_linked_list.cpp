@@ -142,7 +142,7 @@ void reverse() {
     Node<T>* actual = head;
     Node<T>* temp = nullptr;
 
-    while (current != nullptr) {
+    while (actual != nullptr) {
         temp = actual->prev;
         actual->prev = actual->next;
         actual->next = temp;
