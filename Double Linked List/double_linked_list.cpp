@@ -9,7 +9,7 @@ struct Node{
 };
 
 template<typename T>
-class List{
+class Double_Linked_List{
 private:
     Node<T>* head = nullptr;
     Node<T>* tail;
