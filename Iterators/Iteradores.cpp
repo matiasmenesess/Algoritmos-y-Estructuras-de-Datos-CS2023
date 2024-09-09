@@ -34,6 +34,13 @@ int main() {
         cout << *it << " ";
     }
     
+
+    operator*(): devuelve el contenido de la posición actual del iterador
+    operator!=(): devuelve verdadero si dos iteradores son diferentes
+    operator=(): asigna un iterador a otro
+
+
+    
     
     return 0;
 }
