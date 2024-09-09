@@ -41,6 +41,36 @@ public:
         head = newNode;
     }
 
+void pop_front() {
+    if (head == nullptr) return;
+
+    Node<T>* temp = head;
+    head = head->next;
+
+    if (head != nullptr) {
+        head->prev = nullptr;
+    } else {
+        tail = nullptr;
+    }
+
+    delete temp;
+}
+
+void pop_back() {
+    if (tail == nullptr) return;
+
+    Node<T>* temp = tail;
+    tail = tail->prev;
+
+    if (tail != nullptr) {
+        tail->next = nullptr;
+    } else {
+        head = nullptr;
+    }
+
+    delete temp;
+}
+
     void push_back(T value) {
         Node<T>* newNode = new Node<T>;
         newNode->data = value;
