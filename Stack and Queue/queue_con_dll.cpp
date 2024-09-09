@@ -20,26 +20,22 @@ public:
         return front->data;
     }
 
-
-
     T rear_() {
         return rear->data;
     }
 
     bool empty() {
-        return front  == nullptr;
+        return front == nullptr;
     }
 
-
     void push_back(T value) {
-
         Node<T>* newNode = new Node<T>;
         newNode->data = value;
         newNode->next = nullptr;
         newNode->prev = rear;
 
         if (rear == nullptr) {
-            front  = newNode;
+            front = newNode;
         } else {
             rear->next = newNode;
         }
@@ -48,15 +44,15 @@ public:
     }
 
     void pop_front() {
-        if (front  == nullptr) {
+        if (front == nullptr) {
             return;
         }
-        Node<T>* temp = front ;
-        front  = front ->next;
-        if (front  == nullptr) {
+        Node<T>* temp = front;
+        front = front->next;
+        if (front == nullptr) {
             rear = nullptr;
         } else {
-            front ->prev = nullptr;
+            front->prev = nullptr;
         }
         delete temp;
         size--;
@@ -65,23 +61,19 @@ public:
     int getSize() const {
         return size;
     }
-
-
 };
 
 template<typename T>
 class queue{
-
     Double_Linked_List<T> queue_;
     int max_size;
 
 public:
-
     queue(int size){
         max_size = size;
     }
 
-    bool isempty() const {
+    bool isempty() {
         return queue_.empty();
     }
 
@@ -91,10 +83,6 @@ public:
 
     T front(){
         return queue_.front_();
-    }
-
-    T rear(){
-        return queue_.rear_();
     }
 
     void enqueue(T val) {
@@ -111,6 +99,9 @@ public:
         queue_.pop_front();
     }
 
+    int getSize() const {
+        return queue_.getSize();
+    }
 };
 
 
