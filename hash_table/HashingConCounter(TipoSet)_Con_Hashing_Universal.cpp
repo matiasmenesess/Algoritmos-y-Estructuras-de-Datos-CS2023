@@ -1,7 +1,6 @@
 #include <iostream>
 #include <random>
 #include <cmath>
-#include <vector>
 using namespace std;
 
 random_device rd;
@@ -74,10 +73,6 @@ public:
         b = dist(gen);
     }
 
-    ~Hash_Table() {
-        delete[] table;
-    }
-
     void insert(T1 key, T2 value) {
         if (element_count >= current_size * 0.8) {
             resize();
@@ -89,7 +84,7 @@ public:
         while (table[index].key != T1() && table[index].key != key) {
             index = (index + 1) % current_size;
             if (index == original_index) {
-                throw runtime_error("Hash table is full");
+                return;
             }
         }
 
@@ -163,10 +158,6 @@ public:
         }
     }
 
-    bool isEmpty() const {
-        return element_count == 0;
-    }
-
     void display() {
         for (int i = 0; i < current_size; i++) {
             if (table[i].key != T1()) {
@@ -177,6 +168,14 @@ public:
 
     int getElementCount() const {
         return element_count;
+    }
+
+    bool isEmpty() const {
+        return element_count == 0;
+    }
+
+    ~Hash_Table() {
+        delete[] table;
     }
 };
 
