@@ -1,6 +1,7 @@
 #include <iostream>
 #include <random>
 #include <cmath>
+#include <vector>
 using namespace std;
 
 random_device rd;
@@ -40,11 +41,7 @@ int generarRandomPrimo(int m) {
 }
 
 template <typename T>
-int hash_function(T key, int m) {
-    int P = generarRandomPrimo(m);
-    uniform_int_distribution<> dist(1, P - 1);
-    int a = dist(gen);
-    int b = dist(gen);
+int hash_function(T key, int m, int a, int b, int P) {
     int k = calcularBits(key);
     int index = ((a * k + b) % P) % m;
     return index;
@@ -53,20 +50,28 @@ int hash_function(T key, int m) {
 template <typename T1, typename T2>
 struct key_value {
     T1 key = T1();
-    T2 value =T2();
+    T2 value = T2();
 };
 
 template <typename T1, typename T2>
 class Hash_Table {
     int current_size;
     int element_count;
-    key_value<T1,T2>* table;
+    int a;
+    int b;
+    int P;  
+    key_value<T1, T2>* table;
 
 public:
     Hash_Table(int initial_size) {
-        table = new key_value<T1,T2>[initial_size];
+        table = new key_value<T1, T2>[initial_size];
         current_size = initial_size;
         element_count = 0;
+
+        P = generarRandomPrimo(initial_size);  
+        uniform_int_distribution<> dist(1, P - 1);
+        a = dist(gen);  
+        b = dist(gen);  
     }
 
     ~Hash_Table() {
@@ -77,13 +82,20 @@ public:
         if (element_count >= current_size * 0.8) {
             resize();
         }
-        int index = hash_function(key, current_size);
-        while (table[index].key != T1()) {
+
+        int index = hash_function(key, current_size, a, b, P);
+
+        while (table[index].key != T1() && table[index].key != key) {
             index = (index + 1) % current_size;
         }
-        table[index].key = key;
-        table[index].value = value;
-        element_count++;
+
+        if (table[index].key == key) {
+            table[index].value += value;
+        } else {
+            table[index].key = key;
+            table[index].value = value;
+            element_count++;
+        }
     }
 
     void resize() {
@@ -91,7 +103,7 @@ public:
         key_value<T1, T2>* new_table = new key_value<T1, T2>[new_size];
         for (int i = 0; i < current_size; i++) {
             if (table[i].key != T1()) {
-                int index = hash_function(table[i].key, new_size);
+                int index = hash_function(table[i].key, new_size, a, b, P);
                 while (new_table[index].key != T1()) {
                     index = (index + 1) % new_size;
                 }
@@ -105,7 +117,7 @@ public:
         current_size = new_size;
     }
 
-    T2* search_lineal(T1 key) { //O(n) peor caso, cambiaria si cambiasemos la hf
+    T2* search_lineal(T1 key) {
         for (int i = 0; i < current_size; i++) {
             if (table[i].key == key) {
                 return &table[i].value;
@@ -135,24 +147,39 @@ public:
             }
         }
     }
-};
-int main() {
-    Hash_Table<string, int> hashTable(10);
 
-    hashTable.insert("key1", 10);
-    hashTable.insert("key2", 20);
-    hashTable.insert("key3", 30);
+    int getElementCount() const {
+        return element_count;
+    }
+
+};
+
+string convert(string s) {
+    vector<string> abecedario = {
+            ".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..", ".---",
+            "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.", "...", "-",
+            "..-", "...-", ".--", "-..-", "-.--", "--.."
+    };
+
+    string vacio = "";
+
+    for (auto c : s) {
+        int index = c % 97;
+        string s = abecedario[index];
+        vacio += s;
+    }
+    return vacio;
+}
+
+int main() {
+    Hash_Table<string, int> hashTable(100);
+    hashTable.insert(convert("gin"), 1);
+    hashTable.insert(convert("zen"), 1);
+    hashTable.insert(convert("gig"), 1);
+    hashTable.insert(convert("msg"), 1);
 
     hashTable.display();
-
-    int* result = hashTable.search_lineal("key9");
-    if (result) {
-        cout << "Valor encontrado para 'key9': " << *result << endl;
-    }
-    else {
-        cout << "'key2' no encontrado." << endl;
-    }
-
+    cout<<hashTable.getElementCount();
 
     return 0;
 }
