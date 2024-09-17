@@ -59,7 +59,7 @@ class Hash_Table {
     int element_count;
     int a;
     int b;
-    int P;  
+    int P;
     key_value<T1, T2>* table;
 
 public:
@@ -68,10 +68,10 @@ public:
         current_size = initial_size;
         element_count = 0;
 
-        P = generarRandomPrimo(initial_size);  
+        P = generarRandomPrimo(initial_size);
         uniform_int_distribution<> dist(1, P - 1);
-        a = dist(gen);  
-        b = dist(gen);  
+        a = dist(gen);
+        b = dist(gen);
     }
 
     ~Hash_Table() {
@@ -84,9 +84,13 @@ public:
         }
 
         int index = hash_function(key, current_size, a, b, P);
+        int original_index = index;
 
         while (table[index].key != T1() && table[index].key != key) {
             index = (index + 1) % current_size;
+            if (index == original_index) {
+                throw runtime_error("Hash table is full");
+            }
         }
 
         if (table[index].key == key) {
@@ -100,6 +104,13 @@ public:
 
     void resize() {
         int new_size = current_size * 2;
+
+        P = generarRandomPrimo(new_size);
+
+        uniform_int_distribution<> dist(1, P - 1);
+        a = dist(gen);
+        b = dist(gen);
+
         key_value<T1, T2>* new_table = new key_value<T1, T2>[new_size];
         for (int i = 0; i < current_size; i++) {
             if (table[i].key != T1()) {
@@ -117,21 +128,37 @@ public:
         current_size = new_size;
     }
 
-    T2* search_lineal(T1 key) {
-        for (int i = 0; i < current_size; i++) {
-            if (table[i].key == key) {
-                return &table[i].value;
+
+    T2* search(T1 key) {
+        int index = hash_function(key, current_size, a, b, P);
+        int original_index = index;
+
+        while (table[index].key != T1()) {
+            if (table[index].key == key) {
+                return &table[index].value;
+            }
+            index = (index + 1) % current_size;
+            if (index == original_index) {
+                return nullptr;
             }
         }
         return nullptr;
     }
 
-    void eliminate_lineal(T1 key) {
-        for (int i = 0; i < current_size; i++) {
-            if (table[i].key == key) {
-                table[i].key = T1();
-                table[i].value = T2();
+    void eliminate(T1 key) {
+        int index = hash_function(key, current_size, a, b, P);
+        int original_index = index;
+
+        while (table[index].key != T1()) {
+            if (table[index].key == key) {
+                table[index].key = T1();
+                table[index].value = T2();
                 element_count--;
+                return;
+            }
+            index = (index + 1) % current_size;
+            if (index == original_index) {
+                break;
             }
         }
     }
@@ -151,35 +178,19 @@ public:
     int getElementCount() const {
         return element_count;
     }
-
 };
 
-string convert(string s) {
-    vector<string> abecedario = {
-            ".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..", ".---",
-            "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.", "...", "-",
-            "..-", "...-", ".--", "-..-", "-.--", "--.."
-    };
-
-    string vacio = "";
-
-    for (auto c : s) {
-        int index = c % 97;
-        string s = abecedario[index];
-        vacio += s;
-    }
-    return vacio;
-}
-
 int main() {
-    Hash_Table<string, int> hashTable(100);
-    hashTable.insert(convert("gin"), 1);
-    hashTable.insert(convert("zen"), 1);
-    hashTable.insert(convert("gig"), 1);
-    hashTable.insert(convert("msg"), 1);
+    Hash_Table<int, int> ht(10);
 
-    hashTable.display();
-    cout<<hashTable.getElementCount();
+    ht.insert(1, 10);
+    ht.insert(2, 20);
+    ht.insert(3, 30);
+
+    ht.display();
+
+    ht.eliminate(2);
+    ht.display();
 
     return 0;
 }
