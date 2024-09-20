@@ -1,7 +1,5 @@
-
 #include <iostream>
 #include <random>
-#include <cmath>
 #include <vector>
 using namespace std;
 
@@ -18,7 +16,13 @@ int calcularBits(const char& key) {
 
 int calcularBits(const int& key) {
     if (key == 0) return 1;
-    return (int)log2(key) + 1;
+    int bits = 0;
+    int value = key;
+    while (value > 0) {
+        bits++;
+        value >>= 1; 
+    }
+    return bits;
 }
 
 bool esPrimo(int n) {
@@ -44,8 +48,7 @@ int generarRandomPrimo(int m) {
 template <typename T>
 int hash_function(T key, int m, int a, int b, int P) {
     int k = calcularBits(key);
-    int index = ((a * k + b) % P) % m;
-    return index;
+    return ((a * k + b) % P) % m;
 }
 
 template <typename T1, typename T2>
@@ -62,6 +65,21 @@ class Hash_Table {
     int b;
     int P;
     key_value<T1, T2>* table;
+
+    int encontrarIndex(T1 key, int m) {
+        int index = hash_function(key, m, a, b, P);
+        int original_index = index;
+
+        while (table[index].key != T1()) {
+            if (table[index].key == key) {
+                return index;
+            }
+            index = (index + 1) % m;
+            if (index == original_index) break;
+        }
+
+        return index;
+    }
 
 public:
     Hash_Table(int initial_size) {
@@ -84,20 +102,15 @@ public:
             resize();
         }
 
-        int index = hash_function(key, current_size, a, b, P);
-        int original_index = index;
+        int index = encontrarIndex(key, current_size);
 
-        while (table[index].key != T1()) {
-            index = (index + 1) % current_size;
-            if (index == original_index) {
-                return;
-            }
+        if (table[index].key == T1()) {
+            table[index].key = key;
+            table[index].value = value;
+            element_count++;
         }
-
-        table[index].key = key;
-        table[index].value = value;
-        element_count++;
     }
+
 
     void resize() {
         int new_size = current_size * 2;
@@ -109,6 +122,10 @@ public:
         b = dist(gen);
 
         key_value<T1, T2>* new_table = new key_value<T1, T2>[new_size];
+        for (int i = 0; i < new_size; ++i) {
+            new_table[i] = key_value<T1, T2>();
+        }
+
         for (int i = 0; i < current_size; i++) {
             if (table[i].key != T1()) {
                 int index = hash_function(table[i].key, new_size, a, b, P);
@@ -126,36 +143,19 @@ public:
     }
 
     T2* search(T1 key) {
-        int index = hash_function(key, current_size, a, b, P);
-        int original_index = index;
-
-        while (table[index].key != T1()) {
-            if (table[index].key == key) {
-                return &table[index].value;
-            }
-            index = (index + 1) % current_size;
-            if (index == original_index) {
-                return nullptr;
-            }
+        int index = encontrarIndex(key, current_size);
+        if (table[index].key == key) {
+            return &table[index].value;
         }
         return nullptr;
     }
 
     void eliminate(T1 key) {
-        int index = hash_function(key, current_size, a, b, P);
-        int original_index = index;
-
-        while (table[index].key != T1()) {
-            if (table[index].key == key) {
-                table[index].key = T1();
-                table[index].value = T2();
-                element_count--;
-                return;
-            }
-            index = (index + 1) % current_size;
-            if (index == original_index) {
-                break;
-            }
+        int index = encontrarIndex(key, current_size);
+        if (table[index].key == key) {
+            table[index].key = T1();
+            table[index].value = T2();
+            element_count--;
         }
     }
 
@@ -174,11 +174,4 @@ public:
     int getElementCount() const {
         return element_count;
     }
-    
-};
-
-
-int main(){
-    
-    return 0;
 };
