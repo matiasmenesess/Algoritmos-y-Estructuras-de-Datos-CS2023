@@ -24,6 +24,7 @@ public:
         if (stack_.size() != max_size) {
             stack_.push_back(val);
         } else {
+            cout << "Stack is full!" << endl;
         }
     }
 
@@ -31,6 +32,7 @@ public:
         if (!stack_.empty()) {
             stack_.pop_back();
         } else {
+            cout << "Stack is empty!" << endl;
         }
     }
 
@@ -131,6 +133,7 @@ public:
 
     void enqueue(T val) {
         if (isfull()) {
+            cout << "Queue is full!" << endl;
             return;
         }
         queue_.push_back(val);
@@ -138,6 +141,7 @@ public:
 
     void dequeue() {
         if (isempty()) {
+            cout << "Queue is empty!" << endl;
             return;
         }
         queue_.pop_front();
@@ -359,6 +363,40 @@ bool EsSubArbol(NodeBT<T>* root, NodeBT<T>* subRoot) {
     return EsSubArbol(root->left, subRoot) || EsSubArbol(root->right, subRoot);
 }
 
+template <typename T>
+NodeBT<T>* ConstruirBalanceado(vector<T>& nodos, int start, int end) {
+    if (start > end) return nullptr;
+
+    int mid = start + (end - start) / 2;
+    NodeBT<T>* root = new NodeBT<T>{nodos[mid]};
+
+    root->left = ConstruirBalanceado(nodos, start, mid - 1);
+    root->right = ConstruirBalanceado(nodos, mid + 1, end);
+
+    return root;
+}
+
+template <typename T>
+NodeBT<T>* autoBalanceo(NodeBT<T>* root) {
+    vector<T> nodos;
+    inOrder(root, nodos);
+
+    return buildBalancedTree(nodos, 0, nodos.size() - 1);
+}
+
+template<typename T>
+NodeBT<T>* LCA(NodeBT<T>* root, T valor1, T valor2) {
+    while (root != nullptr) {
+        if (valor1 < root->data && valor2 < root->data) {
+            root = root->left;
+        } else if (valor1 > root->data && valor2 > root->data) {
+            root = root->right;
+        } else {
+            return root;
+        }
+    }
+}
+
 int main() {
     BSTree<int> bst;
     bst.insert(5);
@@ -366,18 +404,6 @@ int main() {
     bst.insert(7);
     bst.insert(2);
     bst.insert(4);
-
-    cout << "In-Order traversal: ";
-    bst.inOrder();
-
-    cout << "Pre-Order traversal: ";
-    bst.preOrder();
-
-    cout << "Post-Order traversal: ";
-    bst.postOrder();
-
-    cout << "BFS traversal: ";
-    bst.BreadthFirstSearch();
 
     return 0;
 }
