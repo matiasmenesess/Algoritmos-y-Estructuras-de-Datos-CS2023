@@ -15,88 +15,23 @@ class BSTree {
     NodeBT<T> *root;
     int contador_de_elementos;
 
-    void insert_funcion(NodeBT<T>*& node, T value) {
-        if (node == nullptr) {
-            node = new NodeBT<T>{value};
-        } else if (value < node->data) {
-            insert_funcion(node->left, value);
-        } else if (value > node->data) {
-            insert_funcion(node->right, value);
-        }
-    }
-
-    void Borrar(NodeBT<T>*& node, T value) {
-        if (node == nullptr) return;
-
-        if (value < node->data) {
-            Borrar(node->left, value);
-        }
-        else if (value > node->data) {
-            Borrar(node->right, value);
-        }
-        else {
-            if (node->left == nullptr && node->right == nullptr) {
-                delete node;
-                node = nullptr;
-            }
-            else if (node->left == nullptr) {
-                NodeBT<T>* temp = node;
-                node = node->right;
-                delete temp;
-            }
-            else if (node->right == nullptr) {
-                NodeBT<T>* temp = node;
-                node = node->left;
-                delete temp;
-            } else {
-                NodeBT<T>* pred = predecesor_funcion(node->left);
-                node->data = pred->data;
-                Borrar(node->left, pred->data);
-            }
-        }
-    }
-
-    NodeBT<T>* predecesor_funcion(NodeBT<T>*& node) {
-        while (node->right != nullptr) {
-            node = node->right;
-        }
-        return node;
-    }
-
-    void PreOrder(NodeBT<T>* node) {
-        if (node == nullptr) return;
-        cout << node->data << " ";
-        PreOrder(node->left);
-        PreOrder(node->right);
-    }
-
-    void InOrder(NodeBT<T>* node) {
-        if (node == nullptr) return;
-        InOrder(node->left);
-        cout << node->data << " ";
-        InOrder(node->right);
-    }
-
-    void PostOrder(NodeBT<T>* node) {
-        if (node == nullptr) return;
-        PostOrder(node->left);
-        PostOrder(node->right);
-        cout << node->data << " ";
-    }
-
-    // clear
-    void clear(NodeBT<T>* node) {
-        if (node == nullptr) return;
-        clear(node->left);
-        clear(node->right);
-        delete node;
-    }
-
 public:
     BSTree() : root(nullptr), contador_de_elementos(0) {}
 
     ~BSTree() {
         clear(root);
+    }
+
+    NodeBT<T> *getRoot() const {
+        return root;
+    }
+
+    void setRoot(NodeBT<T> *root) {
+        BSTree::root = root;
+    }
+
+    bool balanceadooooo(){
+        return balanceado(root);
     }
 
     void insert(T value) {
@@ -132,24 +67,130 @@ public:
     }
 };
 
+
+template <typename T>
+void insert_funcion(NodeBT<T>*& node, T value) {
+    if (node == nullptr) {
+        node = new NodeBT<T>{value};
+    } else if (value < node->data) {
+        insert_funcion(node->left, value);
+    } else if (value > node->data) {
+        insert_funcion(node->right, value);
+    }
+}
+
+template <typename T>
+void Borrar(NodeBT<T>*& node, T value) {
+    if (node == nullptr) return;
+
+    if (value < node->data) {
+        Borrar(node->left, value);
+    }
+    else if (value > node->data) {
+        Borrar(node->right, value);
+    }
+    else {
+        if (node->left == nullptr && node->right == nullptr) {
+            delete node;
+            node = nullptr;
+        }
+        else if (node->left == nullptr) {
+            NodeBT<T>* temp = node;
+            node = node->right;
+            delete temp;
+        }
+        else if (node->right == nullptr) {
+            NodeBT<T>* temp = node;
+            node = node->left;
+            delete temp;
+        } else {
+            NodeBT<T>* pred = predecesor_funcion(node->left);
+            node->data = pred->data;
+            Borrar(node->left, pred->data);
+        }
+    }
+}
+
+template <typename T>
+NodeBT<T>* predecesor_funcion(NodeBT<T>*& node) {
+    while (node->right != nullptr) {
+        node = node->right;
+    }
+    return node;
+}
+
+template <typename T>
+void PreOrder(NodeBT<T>* node) {
+    if (node == nullptr) return;
+    cout << node->data << " ";
+    PreOrder(node->left);
+    PreOrder(node->right);
+}
+
+
+template <typename T>
+void PostOrder(NodeBT<T>* node) {
+    if (node == nullptr) return;
+    PostOrder(node->left);
+    PostOrder(node->right);
+    cout << node->data << " ";
+}
+
+template <typename T>
+void clear(NodeBT<T>* node) {
+    if (node == nullptr) return;
+    clear(node->left);
+    clear(node->right);
+    delete node;
+}
+
+template <typename T>
+int height(NodeBT<T>* root)
+{
+    if (root == nullptr) {
+        return 0;
+    }
+
+    return 1 + max(height(root->left), height(root->right));
+}
+
+template <typename T>
+bool balanceado(NodeBT<T>* node){
+
+    if(node== nullptr){
+        return true;
+    }
+
+    if((abs(height(node->right) - height(node->left)))<=1){
+       return (balanceado(node->left) && balanceado(node->right));
+    }
+    else{
+        return false;
+    }
+}
+
+template <typename T>
+void InOrder(NodeBT<T>* node) {
+    if (node == nullptr) return;
+    InOrder(node->left);
+    cout << node->data << " ";
+    InOrder(node->right);
+}
+
+template <typename T>
+void AutoBalanceado(NodeBT<T>*& nodo){
+    vector<T> IO = InOrder(nodo,IO);
+    cout<<IO[2];
+}
+
 int main() {
     BSTree<int> bst;
 
     bst.insert(5);
-    bst.insert(3);
+    bst.insert(6);
+    bst.insert(7);
+    bst.insert(8);
     bst.insert(9);
-    bst.insert(1);
-    bst.insert(4);
-    bst.insert(12);
-    bst.insert(11);
-
-    cout << "arbol antes de eliminar: ";
-    bst.inOrder();
-
-    bst.eliminar(3);
-
-    cout << "arbol despues de eliminar: ";
-    bst.inOrder();
 
     return 0;
 }
