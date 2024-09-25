@@ -1,3 +1,5 @@
+//problema_x.cpp
+
 //Integrantes:
 //1. Olivares Sarmiento, Javier Ignacio Leon
 //2. Silva Reyes, Santiago Miguel
