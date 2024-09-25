@@ -24,7 +24,6 @@ public:
         if (stack_.size() != max_size) {
             stack_.push_back(val);
         } else {
-            cout << "Stack is full!" << endl;
         }
     }
 
@@ -32,7 +31,6 @@ public:
         if (!stack_.empty()) {
             stack_.pop_back();
         } else {
-            cout << "Stack is empty!" << endl;
         }
     }
 
@@ -133,7 +131,6 @@ public:
 
     void enqueue(T val) {
         if (isfull()) {
-            cout << "Queue is full!" << endl;
             return;
         }
         queue_.push_back(val);
@@ -141,7 +138,6 @@ public:
 
     void dequeue() {
         if (isempty()) {
-            cout << "Queue is empty!" << endl;
             return;
         }
         queue_.pop_front();
