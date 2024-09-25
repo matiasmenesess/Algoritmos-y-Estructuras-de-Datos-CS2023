@@ -122,7 +122,7 @@ NodeBT<T>* predecesor_funcion(NodeBT<T>*& node) {
 template <typename T>
 void PreOrder(NodeBT<T>* node) {
     if (node == nullptr) return;
-    cout << node->data << " ";
+    cout << node->data << " "; // IMPRIME - IZQUIERDA - DERECHA
     PreOrder(node->left);
     PreOrder(node->right);
 }
@@ -131,7 +131,7 @@ void PreOrder(NodeBT<T>* node) {
 template <typename T>
 void PostOrder(NodeBT<T>* node) {
     if (node == nullptr) return;
-    PostOrder(node->left);
+    PostOrder(node->left); //IZQ - DERECHA - IMPRIME
     PostOrder(node->right);
     cout << node->data << " ";
 }
@@ -172,15 +172,9 @@ bool balanceado(NodeBT<T>* node){
 template <typename T>
 void InOrder(NodeBT<T>* node) {
     if (node == nullptr) return;
-    InOrder(node->left);
+    InOrder(node->left); //IZQ - IMPRIME - DERECHA
     cout << node->data << " ";
     InOrder(node->right);
-}
-
-template <typename T>
-void AutoBalanceado(NodeBT<T>*& nodo){
-    vector<T> IO = InOrder(nodo,IO);
-    cout<<IO[2];
 }
 
 int main() {
