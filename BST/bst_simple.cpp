@@ -40,7 +40,7 @@ public:
     }
 
     bool find(T value) {
-        return find(root, value);
+        return find_funcion(root, value);
     }
 
     NodeBT<T>* predecesor() {
@@ -162,12 +162,26 @@ bool balanceado(NodeBT<T>* node){
     }
 
     if((abs(height(node->right) - height(node->left)))<=1){
-       return (balanceado(node->left) && balanceado(node->right));
+        return (balanceado(node->left) && balanceado(node->right));
     }
     else{
         return false;
     }
 }
+
+template <typename T>
+bool find_funcion(NodeBT<T>* node, T value) {
+    if (node == nullptr) {
+        return false;
+    } else if (node->data == value) {
+        return true;
+    } else if (value < node->data) {
+        return find_funcion(node->left, value);
+    } else {
+        return find_funcion(node->right, value);
+    }
+}
+
 
 template <typename T>
 void InOrder(NodeBT<T>* node) {
