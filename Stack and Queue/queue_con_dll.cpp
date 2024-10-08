@@ -1,18 +1,22 @@
 #include <iostream>
+#include <vector>
+using namespace std;
+
+#include <iostream>
 using namespace std;
 
 template<typename T>
-struct Node{
+struct NodeDLL{
     T data;
-    Node<T> * prev = nullptr;
-    Node<T> * next = nullptr;
+    NodeDLL<T> * prev = nullptr;
+    NodeDLL<T> * next = nullptr;
 };
 
 template<typename T>
 class Double_Linked_List{
 private:
-    Node<T>* front = nullptr;
-    Node<T>* rear = nullptr;
+    NodeDLL<T>* front = nullptr;
+    NodeDLL<T>* rear = nullptr;
     int size = 0;
 
 public:
@@ -29,7 +33,7 @@ public:
     }
 
     void push_back(T value) {
-        Node<T>* newNode = new Node<T>;
+        NodeDLL<T>* newNode = new NodeDLL<T>;
         newNode->data = value;
         newNode->next = nullptr;
         newNode->prev = rear;
@@ -47,7 +51,7 @@ public:
         if (front == nullptr) {
             return;
         }
-        Node<T>* temp = front;
+        NodeDLL<T>* temp = front;
         front = front->next;
         if (front == nullptr) {
             rear = nullptr;
@@ -64,12 +68,12 @@ public:
 };
 
 template<typename T>
-class queue{
+class Queue{
     Double_Linked_List<T> queue_;
     int max_size;
 
 public:
-    queue(int size){
+    Queue(int size){
         max_size = size;
     }
 
@@ -104,10 +108,4 @@ public:
     }
 };
 
-
-int main() {
-
-
-    return 0;
-}
 
