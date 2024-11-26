@@ -10,7 +10,7 @@ struct Cell {
 
 struct Header {
     int index;
-    Cell* next; // puntero al primer nodo
+    Cell* next;
     Header* nextHeader;
     Header(int i) : index(i), next(nullptr), nextHeader(nullptr) {}
 };
@@ -21,7 +21,6 @@ private:
     Header* colHead;
     int rows, cols;
 
-    // Buscar o crear cabecera para filas
     Header* getOrCreateRowHeader(int row) {
         Header* prev = nullptr;
         Header* curr = rowHead;
@@ -42,7 +41,6 @@ private:
         return curr;
     }
 
-    // Buscar o crear cabecera para columnas
     Header* getOrCreateColHeader(int col) {
         Header* prev = nullptr;
         Header* curr = colHead;
@@ -102,7 +100,6 @@ public:
         newCell->nextCol = colCurr;
     }
 
-    // Mostrar la matriz
     void display() {
         for (int i = 0; i < rows; ++i) {
             Header* rowHeader = getOrCreateRowHeader(i);
@@ -119,6 +116,93 @@ public:
         }
     }
 
+    SparseMatrix* add(SparseMatrix* other) {
+        SparseMatrix* result = new SparseMatrix(rows, cols);
+        for (int i = 0; i < rows; ++i) {
+            Header* rowHeader1 = getOrCreateRowHeader(i);
+            Header* rowHeader2 = other->getOrCreateRowHeader(i);
+            Cell* cell1 = rowHeader1->next;
+            Cell* cell2 = rowHeader2->next;
+
+            while (cell1 || cell2) {
+                if (cell1 && (!cell2 || cell1->col < cell2->col)) {
+                    result->insert(cell1->row, cell1->col, cell1->value);
+                    cell1 = cell1->nextRow;
+                } else if (cell2 && (!cell1 || cell2->col < cell1->col)) {
+                    result->insert(cell2->row, cell2->col, cell2->value);
+                    cell2 = cell2->nextRow;
+                } else {
+                    result->insert(cell1->row, cell1->col, cell1->value + cell2->value);
+                    cell1 = cell1->nextRow;
+                    cell2 = cell2->nextRow;
+                }
+            }
+        }
+        return result;
+    }
+
+    SparseMatrix* subtract(SparseMatrix* other) {
+        SparseMatrix* result = new SparseMatrix(rows, cols);
+        for (int i = 0; i < rows; ++i) {
+            Header* rowHeader1 = getOrCreateRowHeader(i);
+            Header* rowHeader2 = other->getOrCreateRowHeader(i);
+            Cell* cell1 = rowHeader1->next;
+            Cell* cell2 = rowHeader2->next;
+
+            while (cell1 || cell2) {
+                if (cell1 && (!cell2 || cell1->col < cell2->col)) {
+                    result->insert(cell1->row, cell1->col, cell1->value);
+                    cell1 = cell1->nextRow;
+                } else if (cell2 && (!cell1 || cell2->col < cell1->col)) {
+                    result->insert(cell2->row, cell2->col, -cell2->value);
+                    cell2 = cell2->nextRow;
+                } else {
+                    result->insert(cell1->row, cell1->col, cell1->value - cell2->value);
+                    cell1 = cell1->nextRow;
+                    cell2 = cell2->nextRow;
+                }
+            }
+        }
+        return result;
+    }
+
+    SparseMatrix* multiply(SparseMatrix* other) {
+        if (cols != other->rows) {
+            throw invalid_argument("Dimensiones incompatibles para la multiplicación");
+        }
+        SparseMatrix* result = new SparseMatrix(rows, other->cols);
+        for (Header* rowHeader = rowHead; rowHeader; rowHeader = rowHeader->nextHeader) {
+            for (Cell* cell1 = rowHeader->next; cell1; cell1 = cell1->nextRow) {
+                Header* colHeader = other->getOrCreateColHeader(cell1->col);
+                for (Cell* cell2 = colHeader->next; cell2; cell2 = cell2->nextCol) {
+                    int value = cell1->value * cell2->value;
+                    result->insert(cell1->row, cell2->col, result->getValue(cell1->row, cell2->col) + value);
+                }
+            }
+        }
+        return result;
+    }
+
+    int getValue(int row, int col) {
+        Header* rowHeader = getOrCreateRowHeader(row);
+        Cell* cell = rowHeader->next;
+        while (cell) {
+            if (cell->col == col) return cell->value;
+            cell = cell->nextRow;
+        }
+        return 0;
+    }
+
+    SparseMatrix* transpose() {
+        SparseMatrix* result = new SparseMatrix(cols, rows);
+        for (Header* rowCurr = rowHead; rowCurr; rowCurr = rowCurr->nextHeader) {
+            for (Cell* cell = rowCurr->next; cell; cell = cell->nextRow) {
+                result->insert(cell->col, cell->row, cell->value);
+            }
+        }
+        return result;
+    }
+
     ~SparseMatrix() {
         Header* rowCurr = rowHead;
         while (rowCurr) {
@@ -132,30 +216,39 @@ public:
             rowCurr = rowCurr->nextHeader;
             delete toDelete;
         }
-        Header* colCurr = colHead;
-        while (colCurr) {
-            Header* toDelete = colCurr;
-            colCurr = colCurr->nextHeader;
-            delete toDelete;
-        }
     }
 };
 
 int main() {
-    SparseMatrix sm(5, 5);
-    sm.insert(1, 1, 10);
-    sm.insert(2, 3, 20);
-    sm.insert(4, 0, 30);
-    cout << "Matriz dispersa:" << endl;
-    sm.display();
+    SparseMatrix sm1(5, 5);
+    sm1.insert(1, 1, 10);
+    sm1.insert(2, 3, 20);
+    sm1.insert(4, 0, 30);
 
-    sm.insert(3, 2, 8);
-    cout << "Matriz dispersa:" << endl;
-    sm.display();
+    SparseMatrix sm2(5, 5);
+    sm2.insert(1, 1, 5);
+    sm2.insert(2, 3, 15);
+    sm2.insert(4, 1, 25);
 
-    sm.insert(3, 2, 80);
-    cout << "Matriz dispersa:" << endl;
-    sm.display();
+    cout << "Matriz 1:" << endl;
+    sm1.display();
+
+    cout << "Matriz 2:" << endl;
+    sm2.display();
+
+    SparseMatrix* sum = sm1.add(&sm2);
+    cout << "Suma de Matrices:" << endl;
+    sum->display();
+
+    SparseMatrix* diff = sm1.subtract(&sm2);
+    cout << "Resta de Matrices:" << endl;
+    diff->display();
+
+    SparseMatrix* transposed = sm1.transpose();
+    cout << "Transpuesta de Matriz 1:" << endl;
+    transposed->display();
+
+
 
     return 0;
 }
